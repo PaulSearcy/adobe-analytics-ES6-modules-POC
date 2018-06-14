@@ -1,0 +1,6 @@
+*.xls
+.vscode/
+secret.js
+secret.mjs
+importFiles.js
+importFiles.mjs

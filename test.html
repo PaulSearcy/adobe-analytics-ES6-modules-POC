@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Adobe Analytics ES6 Modules POC</title>
+    </head>
+
+    <body>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+        <script type="module">
+            import * as sha1 from './sha1.mjs';
+            import ApiExplorer from './apiExplorer.mjs';
+            for(var alias in sha1){
+                window[alias] = sha1[alias]
+            }
+        </script>
+        <script type="module">
+            window.sendOff = (url,body) => {
+                var url = url
+                var request = new XMLHttpRequest();
+                request.open('POST', url, true);
+
+                var headersMap = ApiExplorer.wsse.generateRESTHeadersMap();
+                for(var key in headersMap) {
+                    if(headersMap.hasOwnProperty(key)) {
+                        request.setRequestHeader(key, headersMap[key]);
+                    }
+                }
+                request.setRequestHeader('Content-Type', 'application/json');
+
+                request.onreadystatechange = function() {
+                    if (request.readyState === XMLHttpRequest.DONE) {
+                        var prettyResponse = JSON.stringify(JSON.parse(request.responseText), null, 2);
+                        console.log(prettyResponse);
+                    }
+                };
+
+                request.send(JSON.stringify(body));
+            }
+
+            window.setCredentials = (username, secret) => {
+                ApiExplorer.wsse.setUser(username)
+                ApiExplorer.wsse.setSecret(secret)
+            }
+
+           window.example = () => window.sendOff('https://api.omniture.com/admin/1.4/rest/?method=Company.GetReportSuites')
+
+        </script>
+    </body>
+
+</html>
